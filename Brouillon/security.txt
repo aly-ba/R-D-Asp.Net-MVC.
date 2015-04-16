@@ -1,0 +1,123 @@
+﻿[ControllerAction]
+public void Authenticate(string uname, string pass)
+{
+User user = dbContext.Users.First (x=>x.UserName.Equals(uname();
+if (user != null && user.Password.Equals(EncryptHash(pass))
+{
+FormsAuthentication.SetAuthCookie(uname, false);
+RedirectToAction("Main", "DashBoard");
+}
+// unable to login
+RenderView("Index", new LoginViewData
+{
+ErrorMessage = "Invalid credentials."
+});
+}
+
+
+/******************************************************/
+public class CustomPrincipal : IPrincipal
+{
+public CustomPrincipal(CustomIdentity identity)
+{
+this.Identity = identity;
+}
+
+public IIdentity Identity { get; private set; }
+public bool IsInRole(string role)
+{
+return true;
+}
+}
+
+public class CustomIdentity : IIdentity
+{
+public CustomIdentity(string name)
+{
+this.Name = name;
+}
+
+public string AuthenticationType
+{
+get { return "Custom"; }
+}
+public bool IsAuthenticated
+{
+get { return !string.IsNullOrEmpty(this.Name); }
+}
+public string Name { get; private set; }
+}
+FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(
+1,
+userName,
+DateTime.Now,
+DateTime.Now.AddDays(90),
+createPersistentCookie, // a Boolean indicating whether a cookie
+// should be created on the user's machine
+String.Join(";",rolesArr) //user's roles
+);
+// add cookie to response stream
+string encTicket = FormsAuthentication.Encrypt(authTicket);
+System.Web.HttpCookie authCookie = new System.Web.HttpCookie(FormsAuthentication.
+FormsCookieName, encTicket);
+System.Web.HttpContext.Current.Response.Cookies.Add(authCookie);
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+<system.web>
+<membership>
+<providers>
+<clear/>
+<add name="AspNetSqlMembershipProvider"
+connectionStringName="sampleDB"
+enablePasswordRetrieval="false"
+enablePasswordReset="true"
+requiresQuestionAndAnswer="false"
+applicationName="/"
+requiresUniqueEmail="true"
+passwordFormat="Hashed"
+maxInvalidPasswordAttempts="3"
+minRequiredPasswordLength="8"
+minRequiredNonalphanumericCharacters="2"
+passwordAttemptWindow="15"
+type="System.Web.Security.SqlMembershipProvider, System.Web,
+Version=2.0.0.0, Culture=neutral />
+</providers>
+
+/membership>
+
+
+///////////////////////////////////Role Manager ///////////////////////////////////////////
+<roleManager defaultProvider="AdminRoleProvider" enabled="true"
+cacheRolesInCookie="true">
+<providers>
+<clear/>
+<add
+name="SqlProvider"
+type="System.Web.Security.SqlRoleProvider"
+connectionStringName="DefaultConnection"
+applicationName="MyApplication"
+enablePasswordRetrieval="false"
+enablePasswordReset="true"
+requiresQuestionAndAnswer="true"
+requiresUniqueEmail="false"
+passwordFormat="Hashed"
+maxInvalidPasswordAttempts="5"
+passwordAttemptWindow
+</providers>
+</roleManager>
+
+/////////////////////////////////////////////////////////////////////////////////////
+string[] userRolesArray = Roles.GetRolesForUser();
+string[] rolesForContentArray = DbContext.GetRolesForViewFromDb(thisViewName);
+if (userRolesArray.Intersect(RolesForContentArray).Count > 0)
+{
+// The user is authorized
+}
+
+
+///////////////////////////////////////////////////////////////
+Email :regular expression:
+[RegularExpression("^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", ErrorMessage = "E-mail is not valid")]
+
