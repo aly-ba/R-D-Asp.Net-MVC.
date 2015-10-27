@@ -1,0 +1,17 @@
+﻿@model IEnumerable<AspNetStore.Models.Category>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>Browse All Category</h3>
+
+<ul class="list-groud">
+    @foreach (var category in Model)
+    {
+        <li class="list-group-item">
+            @Html.ActionLink(category.Name, "Browse", new {id= category.Name})
+        </li>
+    }
+</ul>
